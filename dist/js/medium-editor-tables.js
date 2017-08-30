@@ -36,7 +36,7 @@ function getSelectionText(doc) {
 }
 
 function getSelectionStart(doc) {
-    var node = doc.getSelection().anchorNode,
+    var node = doc.getSelection().baseNode ? doc.getSelection().baseNode : doc.getSelection().anchorNode,
         startNode = (node && node.nodeType === 3 ? node.parentNode : node);
 
     return startNode;
@@ -119,17 +119,25 @@ Grid.prototype = {
     markCells: function () {
         [].forEach.call(this._cellsElements, function (el) {
             var cell = {
-                    column: parseInt(el.dataset.column, 10),
-                    row: parseInt(el.dataset.row, 10)
+                    column: parseInt(el.getAttribute('data-column'), 10),
+                    row: parseInt(el.getAttribute('data-row'), 10)
                 },
                 active = this._currentCell &&
                          cell.row <= this._currentCell.row &&
                          cell.column <= this._currentCell.column;
 
             if (active === true) {
-                el.classList.add('active');
+                if ('classList' in el) {
+                    el.classList.add('active');
+                } else {
+                    el.className += ' ' + 'active';
+                }
             } else {
-                el.classList.remove('active');
+                if ('classList' in el) {
+                    el.classList.remove('active');
+                } else {
+                    el.className = (' ' + el.className).replace(' ' + 'active' + ' ', '');
+                }
             }
         }.bind(this));
     },
@@ -193,15 +201,13 @@ Grid.prototype = {
         var self = this,
             timer;
 
-        el.addEventListener('mouseenter', function () {
+        el.addEventListener('mouseenter', function (e) {
             clearTimeout(timer);
-
-            var dataset = this.dataset;
 
             timer = setTimeout(function () {
                 self._currentCell = {
-                    column: parseInt(dataset.column, 10),
-                    row: parseInt(dataset.row, 10)
+                    column: parseInt(e.target.getAttribute('data-column'), 10),
+                    row: parseInt(e.target.getAttribute('data-row'), 10)
                 };
                 self.markCells();
             }, 50);
@@ -212,7 +218,7 @@ Grid.prototype = {
         var self = this;
         el.addEventListener('click', function (e) {
             e.preventDefault();
-            self._callback(this.dataset.row, this.dataset.column);
+            self._callback(e.target.getAttribute('data-row'), e.target.getAttribute('data-column'));
         });
     }
 };
@@ -557,6 +563,12 @@ MediumEditorTable = MediumEditor.extensions.form.extend({
     action: 'table',
     contentDefault: 'TBL',
     contentFA: '<i class="fa fa-table"></i>',
+
+    init: function () {
+        this.base.subscribe('editableClick', function () {
+            this.hide();
+        }.bind(this));
+    },
 
     handleClick: function (event) {
         event.preventDefault();

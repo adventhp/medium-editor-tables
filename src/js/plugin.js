@@ -10,6 +10,12 @@ MediumEditorTable = MediumEditor.extensions.form.extend({
     contentDefault: 'TBL',
     contentFA: '<i class="fa fa-table"></i>',
 
+    init: function () {
+        this.base.subscribe('editableClick', function () {
+            this.hide();
+        }.bind(this));
+    },
+
     handleClick: function (event) {
         event.preventDefault();
         event.stopPropagation();
