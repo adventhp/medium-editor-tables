@@ -14,6 +14,8 @@ MediumEditorTable = MediumEditor.extensions.form.extend({
         this.base.subscribe('editableClick', function () {
             this.hide();
         }.bind(this));
+
+        MediumEditor.extensions.form.prototype.init.apply(this, arguments);
     },
 
     handleClick: function (event) {
