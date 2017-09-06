@@ -44,6 +44,10 @@ function getSelectionStart(doc) {
 
 function placeCaretAtNode(doc, node, before) {
     if (doc.getSelection !== undefined && node) {
+        if (node.nodeName.toLowerCase() !== 'td') {
+            node = node.parentElement;
+        }
+
         var range = doc.createRange(),
             selection = doc.getSelection();
 
