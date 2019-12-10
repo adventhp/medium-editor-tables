@@ -36,7 +36,14 @@ MediumEditorTable = MediumEditor.extensions.form.extend({
         var range = MediumEditor.selection.getSelectionRange(this.document);
 
         /* Adding condition to limit creation of table only on medium editor */
-        if (range.startContainer.parentElement.offsetParent && range.startContainer.parentElement.offsetParent.id === 'cavo-editor') {
+        if (
+            range &&
+            range.startContainer &&
+            range.startContainer.parentElement.offsetParent &&
+            range.startContainer.parentElement.offsetParent.id.includes(
+                'cavo-editor'
+            )
+        ) {
             if (range.startContainer.nodeName.toLowerCase() === 'td' ||
                 range.endContainer.nodeName.toLowerCase() === 'td' ||
                 MediumEditor.util.getClosestTag(MediumEditor.selection.getSelectedParentElement(range), 'td')) {
